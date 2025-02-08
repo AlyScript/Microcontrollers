@@ -13,7 +13,7 @@ CONTROL  EQU 0x0001_0101
 lbu s1, DATA_BUS
 lbu s2, CONTROL
 
-setup
+puts
 	; /// Step 1 \\\
 
 	lw t0, CONTROL					; read what is in the control already
@@ -51,7 +51,7 @@ loop
 	lw t0, CONTROL
 	li t2, 0b1011					; to set E to 0
 	and t1, t2, t1
-	sw CONTROL t1, t4				; write back to control with correct bits set (t3 must be clear!)
+	sw CONTROL t1, t4				; write back to control with correct bits set (t4 must be clear!)
 	
 	; /// Step 5 \\\
 	; for a 1200 ns delay, we need 12 iterations of the delay loop
@@ -63,9 +63,41 @@ loop
 	; If bit 7 of Status byte was high repeat from Step 2
 	bnez t5, loop
 
+	jal write
 
+; /// Step 7 \\\
+; Carry out the write
+write
+	lw t0 CONTROL
+	li t1, 0b1110				; to set R/W to 0
+	li t2, 0b0010               ; to set RS to 1
 
+	and t1, t0, t1				; for RW
+	or t1, t1, t2				; for RS
+	sw CONTROL t1, t4			; write back to control with correct bits set (t4 must be clear!)
 
+	; /// Step 8 \\\
+	; Now to output the data to the data bus
+	sb s0, DATA_BUS, t4
+
+	; /// Step 9 \\\
+	; Enable the bus
+	lw t0, CONTROL
+	li t1, 0b0100
+ 	or t1, t0, t1
+	sw CONTROL t1, t4
+
+	; /// Step 9a \\\
+	; Delay for 500 ns
+	li t7, 5
+	call delay		
+
+	; /// Step 10 \\\
+	; Disable the bus
+	lw t0, CONTROL
+	li t1, 0b1011
+	and t1, t0, t1
+	sw CONTROL t1, t4
 
 ; we use t7 as our counter for the delay
 ; an empty loop will iterate in 2 + 2 = 4 cycles (100 ns)
@@ -73,15 +105,17 @@ loop
 
 delay
 	addi t7, t7, -1
-	bnez t7, delay		
+	bnez t7, delay
 	ret
 
-; Data Bus is 8 bits
-
-; 		 Control
+; --------------------
+;       SIGNALS
+; --------------------
+; | Data Bus = 8bits |
+; --------------------
+; |		 Control     |
 ; --------------------
 ; LCD R/W      : Bit 0
 ; LCD RS       : Bit 1
 ; LCD E        : Bit 2
 ; LCD Backlight: Bit 3
-	
