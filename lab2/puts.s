@@ -1,4 +1,4 @@
-ORG 0
+jal puts
 
 DATA_BUS EQU 0x0001_0100
 CONTROL  EQU 0x0001_0101
@@ -22,6 +22,8 @@ puts
 	and t0, t1, t0					; set RS  to 0 
 	or t0, t2, t0					; set R/W to 1
 	sw CONTROL t0, t4				; write back to control with correct bits set (t3 must be clear!)
+
+	jal loop
 
 loop
 	; /// Step 2 \\\
@@ -77,7 +79,7 @@ write
 	sw CONTROL t1, t4			; write back to control with correct bits set (t4 must be clear!)
 
 	; /// Step 8 \\\
-	; Now to output the data to the data bus
+	; Now to output the data (character) to the data bus
 	sb s0, DATA_BUS, t4
 
 	; /// Step 9 \\\
@@ -98,6 +100,8 @@ write
 	li t1, 0b1011
 	and t1, t0, t1
 	sw CONTROL t1, t4
+
+	ret
 
 ; we use t7 as our counter for the delay
 ; an empty loop will iterate in 2 + 2 = 4 cycles (100 ns)
