@@ -16,3 +16,5 @@ which does
 ```bash
 git config --global alias.pushboth '!git push origin main && git push github main'
 ```bash
+
+The same applies for pulling!
