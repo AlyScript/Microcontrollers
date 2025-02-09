@@ -14,7 +14,7 @@ git pushboth
 ```
 which does
 ```bash
-git config --global alias.pushboth '!git push origin main && git push github main'
+!git push origin main && git push github main
 ```
 
 The same applies for pulling!
