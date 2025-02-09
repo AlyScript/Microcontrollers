@@ -17,8 +17,8 @@ puts
 	; /// Step 1 \\\
 
 	lw t0, CONTROL					; read what is in the control already
-	li t1, 0b1101					; to set RS to 0 (this might be the wrong way round, I am using Big endian)
-	li t2, 0b0100					; to set R/W to 1 (also might be the wrong way round)
+	li t1, 0b1011					; to set RS to 0 (this might be the wrong way round, I am using little endian)
+	li t2, 0b0010 					; to set R/W to 1 (also might be the wrong way round)
 	and t0, t1, t0					; set RS  to 0 
 	or t0, t2, t0					; set R/W to 1
 	sw CONTROL t0, t4				; write back to control with correct bits set (t3 must be clear!)
@@ -29,7 +29,7 @@ loop
 	; /// Step 2 \\\
 
 	lw t0, CONTROL					; read what is in the control already
-	li t3, 0b0010					; to set E to 1
+	li t3, 0b0100					; to set E to 1
 	or t0, t3, t0					; set E to 1
 	sw CONTROL t0, t4				; write back to control with correct bits set (t3 must be clear!)
 
@@ -44,14 +44,14 @@ loop
 	; We put the value of this into t5
 
 	lw t0, DATA_BUS
-	li t5, 0b1000_0000				
+	li t5, 0b0000_0001				
 	and t5, t0, t5
 
 	; /// Step 4 \\\
 
 	; disable bit 2 of control
 	lw t0, CONTROL
-	li t2, 0b1011					; to set E to 0
+	li t2, 0b1101					; to set E to 0
 	and t1, t2, t1
 	sw CONTROL t1, t4				; write back to control with correct bits set (t4 must be clear!)
 	
@@ -71,8 +71,8 @@ loop
 ; Carry out the write
 write
 	lw t0 CONTROL
-	li t1, 0b1110				; to set R/W to 0
-	li t2, 0b0010               ; to set RS to 1
+	li t1, 0b0111				; to set R/W to 0	
+	li t2, 0b0100               ; to set RS to 1 
 
 	and t1, t0, t1				; for RW
 	or t1, t1, t2				; for RS
@@ -85,7 +85,7 @@ write
 	; /// Step 9 \\\
 	; Enable the bus
 	lw t0, CONTROL
-	li t1, 0b0100
+	li t1, 0b0010 
  	or t1, t0, t1
 	sw CONTROL t1, t4
 
@@ -95,9 +95,9 @@ write
 	call delay		
 
 	; /// Step 10 \\\
-	; Disable the bus
+	; Disable the bus by setting E to 0
 	lw t0, CONTROL
-	li t1, 0b1011
+	li t1, 0b1101 
 	and t1, t0, t1
 	sw CONTROL t1, t4
 
