@@ -8,10 +8,10 @@ li s1, 0x00             ; s1 is the index of the string. This increases by 1 eac
 la s2, STR              ; s2 is a pointer to the string
 print_loop
     lbu s0, [s2]        ; load the character to be printed into s0
-    beqz done           ; if the character is null, we are done
+    beqz s0, done           ; if the character is null, we are done
     addi s2, s2, 1      ; increment string pointer
     call puts           ; print the character
     j print_loop        
     
-done:
+done
     ret    

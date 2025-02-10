@@ -1,4 +1,17 @@
-j puts
+ORG 0
+
+
+
+start
+	li s1, 0x00             ; s1 is the index of the string. This increases by 1 each time a character is printed
+	la s2, STR              ; s2 is a pointer to the string
+	print_loop
+		lbu s0, [s2]        ; load the character to be printed into s0
+		beqz s0, done           ; if the character is null, we are done
+		addi s2, s2, 1      ; increment string pointer
+		call puts           ; print the character
+		j print_loop        
+   
 
 DATA_BUS EQU 0x0001_0100
 CONTROL  EQU 0x0001_0101
@@ -6,12 +19,6 @@ CONTROL  EQU 0x0001_0101
 ; Write a character to the screen
 ; Params:
 ;		s0: Character to be written
-;		s1: Data Bus
-;		s2: Control Address 
-;		s3: 
- 
-lbu s1, DATA_BUS
-lbu s2, CONTROL
 
 puts
 	; /// Step 1 \\\
@@ -112,6 +119,9 @@ delay
 	bnez t6, delay
 	ret
 
+done
+    ret   
+
 ; --------------------
 ;       SIGNALS
 ; --------------------
@@ -123,3 +133,5 @@ delay
 ; LCD RS        : Bit 1
 ; LCD E         : Bit 2
 ; LCD Backlight : Bit 3
+
+STR DEFB 0x48, 0x45, 0x4C, 0x4C, 0x4F, 0x20, 0x57, 0x4F, 0x52, 0x4C, 0x44, 0x21, 0x00  ; ASCII values for "HELLO WORLD!"
