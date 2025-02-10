@@ -3,25 +3,23 @@ ORG 0
 
 
 start
-	li s1, 0x00             ; s1 is the index of the string. This increases by 1 each time a character is printed
 	la s2, STR              ; s2 is a pointer to the string
 	print_loop
-		lbu s0, [s2]        ; load the character to be printed into s0
+		lb s0, [s2]        ; load the character to be printed into s0
 		beqz s0, done           ; if the character is null, we are done
 		addi s2, s2, 1      ; increment string pointer
 		
 		; push ra onto the stack
 		auipc a0, 0
-		addi a0, a0, 8
+		addi a0, a0, 20
 		addi sp, sp, -4
-		sw a0, [sp]
+		sb a0, [sp]
 		
 		call puts           ; print the character
 		j print_loop        
    
 
-DATA_BUS EQU 0x0001_0100
-CONTROL  EQU 0x0001_0101
+
 
 ; Write a character to the screen
 ; Params:
@@ -30,7 +28,7 @@ CONTROL  EQU 0x0001_0101
 puts
 	; /// Step 1 \\\
 
-	lbu t0, CONTROL					; read what is in the control already
+	lb t0, CONTROL					; read what is in the control already
 	li t1, 0b1101					; to set RS to 0 (this might be the wrong way round, I am using little endian)
 	li t2, 0b0001 					; to set R/W to 1 (also might be the wrong way round)
 	and t0, t1, t0					; set RS  to 0 
@@ -121,7 +119,8 @@ write
 	li t4, 0
 	sb t1, CONTROL, t4
 
-	lw ra, 4[sp]
+	lb ra, [sp]
+	addi sp, sp, 4
 	ret
 
 ; we use t6 as our counter for the delay
@@ -149,3 +148,6 @@ done
 ; LCD Backlight : Bit 3
 
 STR DEFB 0x48, 0x45, 0x4C, 0x4C, 0x4F, 0x20, 0x57, 0x4F, 0x52, 0x4C, 0x44, 0x21, 0x00  ; ASCII values for "HELLO WORLD!"
+ALIGN
+DATA_BUS EQU 0x0001_0100
+CONTROL  EQU 0x0001_0101
