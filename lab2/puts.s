@@ -1,6 +1,7 @@
 ORG 0
 
 start
+	li sp, STACK
 	la s2, STR              ; s2 is a pointer to the string
 	print_loop
 		lw s0, [s2]        ; load the character to be printed into s0
@@ -15,8 +16,6 @@ start
 
 		call puts           ; print the character
 		j print_loop        
-   
-
 
 
 ; Write a character to the screen
@@ -145,10 +144,9 @@ done
 ; LCD E         : Bit 2
 ; LCD Backlight : Bit 3
 
-; STR DEFB 0x48, 0x45, 0x4C, 0x4C, 0x4F, 0x20, 0x57, 0x4F, 0x52, 0x4C, 0x44, 0x21, 0x00  ; ASCII values for "Hello World!"
 STR DEFB "Hello World!\0"
 ALIGN
-DATA_BUS DEFW 0x0001_0100
-CONTROL  DEFW 0x0001_0101
-
-DEFS 100 STACK
+DATA_BUS DEFW 0x0001_0100	
+CONTROL  DEFW 0x0001_0101	
+ALIGN						; Align the stack to 4 bytes (this is probably not necessary since we are already aligned?)
+DEFS 100 STACK				; Reserve 100 bytes for the stack and point to the end (this is a stack `size` of 25, since each `item` is a word...)
