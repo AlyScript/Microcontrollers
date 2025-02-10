@@ -9,6 +9,13 @@ start
 		lbu s0, [s2]        ; load the character to be printed into s0
 		beqz s0, done           ; if the character is null, we are done
 		addi s2, s2, 1      ; increment string pointer
+		
+		; push ra onto the stack
+		auipc a0, 0
+		addi a0, a0, 8
+		addi sp, sp, -4
+		sw a0, [sp]
+		
 		call puts           ; print the character
 		j print_loop        
    
@@ -114,6 +121,7 @@ write
 	li t4, 0
 	sb t1, CONTROL, t4
 
+	lw ra, 4[sp]
 	ret
 
 ; we use t6 as our counter for the delay
