@@ -1,7 +1,5 @@
 ORG 0
 
-
-
 start
 	la s2, STR              ; s2 is a pointer to the string
 	print_loop
@@ -152,3 +150,5 @@ STR DEFB "Hello World!\0"
 ALIGN
 DATA_BUS EQU 0x0001_0100
 CONTROL  EQU 0x0001_0101
+
+DEFS 100 STACK
