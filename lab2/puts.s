@@ -6,7 +6,13 @@ CONTROL  EQU 0x0001_0101
 ; Write a character to the screen
 ; Params:
 ;		s0: Character to be written
+;		s1: Data Bus
+;		s2: Control Address 
+;		s3: 
  
+lbu s1, DATA_BUS
+lbu s2, CONTROL
+
 puts
 	; /// Step 1 \\\
 
