@@ -14,7 +14,7 @@ start
 		addi a0, a0, 20
 		addi sp, sp, -4
 		sb a0, [sp]
-		
+
 		call puts           ; print the character
 		j print_loop        
    
@@ -49,7 +49,7 @@ loop
 
 	; /// Step 2a \\\
 
-	li t6, 5                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
+	li t6, 10                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
 	call delay						
 	
 	; /// Step 3 \\\
@@ -72,7 +72,7 @@ loop
 	
 	; /// Step 5 \\\
 	; for a 1200 ns delay, we need 12 iterations of the delay loop
-	li t6, 12
+	li t6, 17
 	call delay
 
 	; /// Step 6 \\\
@@ -108,7 +108,7 @@ write
 
 	; /// Step 9a \\\
 	; Delay for 500 ns
-	li t6, 5
+	li t6, 10
 	call delay		
 
 	; /// Step 10 \\\
