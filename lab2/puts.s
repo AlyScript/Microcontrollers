@@ -1,4 +1,4 @@
-jal puts
+j puts
 
 DATA_BUS EQU 0x0001_0100
 CONTROL  EQU 0x0001_0101
@@ -21,9 +21,9 @@ puts
 	li t2, 0b0010 					; to set R/W to 1 (also might be the wrong way round)
 	and t0, t1, t0					; set RS  to 0 
 	or t0, t2, t0					; set R/W to 1
-	sw CONTROL t0, t4				; write back to control with correct bits set (t3 must be clear!)
+	sw t0, CONTROL, t4				; write back to control with correct bits set (t3 must be clear!)
 
-	jal loop
+	j loop
 
 loop
 	; /// Step 2 \\\
@@ -31,11 +31,11 @@ loop
 	lw t0, CONTROL					; read what is in the control already
 	li t3, 0b0100					; to set E to 1
 	or t0, t3, t0					; set E to 1
-	sw CONTROL t0, t4				; write back to control with correct bits set (t3 must be clear!)
+	sw t0, CONTROL, t4				; write back to control with correct bits set (t3 must be clear!)
 
 	; /// Step 2a \\\
 
-	li t7, 5                        ; t7 == 1 means a 100 ns delay so t7 == 5 means 500 ns delay which is the min delay for the Enable pulse	
+	li t6, 5                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
 	call delay						
 	
 	; /// Step 3 \\\
@@ -53,11 +53,11 @@ loop
 	lw t0, CONTROL
 	li t2, 0b1101					; to set E to 0
 	and t1, t2, t1
-	sw CONTROL t1, t4				; write back to control with correct bits set (t4 must be clear!)
+	sw t1, CONTROL, t4				; write back to control with correct bits set (t4 must be clear!)
 	
 	; /// Step 5 \\\
 	; for a 1200 ns delay, we need 12 iterations of the delay loop
-	li t7, 12
+	li t6, 12
 	call delay
 
 	; /// Step 6 \\\
@@ -70,13 +70,13 @@ loop
 ; /// Step 7 \\\
 ; Carry out the write
 write
-	lw t0 CONTROL
+	lw t0, CONTROL
 	li t1, 0b0111				; to set R/W to 0	
 	li t2, 0b0100               ; to set RS to 1 
 
 	and t1, t0, t1				; for RW
 	or t1, t1, t2				; for RS
-	sw CONTROL t1, t4			; write back to control with correct bits set (t4 must be clear!)
+	sw t1, CONTROL, t4			; write back to control with correct bits set (t4 must be clear!)
 
 	; /// Step 8 \\\
 	; Now to output the data (character) to the data bus
@@ -87,11 +87,11 @@ write
 	lw t0, CONTROL
 	li t1, 0b0010 
  	or t1, t0, t1
-	sw CONTROL t1, t4
+	sw t1, CONTROL, t4
 
 	; /// Step 9a \\\
 	; Delay for 500 ns
-	li t7, 5
+	li t6, 5
 	call delay		
 
 	; /// Step 10 \\\
@@ -99,17 +99,17 @@ write
 	lw t0, CONTROL
 	li t1, 0b1101 
 	and t1, t0, t1
-	sw CONTROL t1, t4
+	sw t1, CONTROL, t4
 
 	ret
 
-; we use t7 as our counter for the delay
+; we use t6 as our counter for the delay
 ; an empty loop will iterate in 2 + 2 = 4 cycles (100 ns)
 ; therefore, for a 1s delay, we need 40_000_000 / 4 = 10_000_000 iterations
 
 delay
-	addi t7, t7, -1
-	bnez t7, delay
+	addi t6, t6, -1
+	bnez t6, delay
 	ret
 
 ; --------------------
