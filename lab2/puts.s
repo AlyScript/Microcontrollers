@@ -39,14 +39,14 @@ loop
 	; /// Step 2 \\\
 
 	lw t0, CONTROL					; read what is in the control already
-	li t3, 0b0100					; to set E to 1
+	li t3, 0b1100					; to set E to 1 (and turn backlight on)
 	or t0, t3, t0					; set E to 1
 	li t4, 0
-	sw t0, CONTROL, t4				; write back to control with correct bits set (t3 must be clear!)
+	sw t0, CONTROL, t4				; write back to control with correct bits set (t4 must be clear!)
 
 	; /// Step 2a \\\
 
-	li t6, 5                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
+	li t6, 10                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
 	call delay						
 	
 	; /// Step 3 \\\
@@ -63,13 +63,13 @@ loop
 	; disable bit 2 of control
 	lw t0, CONTROL
 	li t2, 0b1011					; to set E to 0
-	and t1, t2, t1
+	and t0, t2, t0
 	li t4, 0
-	sw t1, CONTROL, t4				; write back to control with correct bits set (t4 must be clear!)
+	sw t0, CONTROL, t4				; write back to control with correct bits set (t4 must be clear!)
 	
 	; /// Step 5 \\\
 	; for a 1200 ns delay, we need 12 iterations of the delay loop
-	li t6, 12
+	li t6, 30
 	call delay
 
 	; /// Step 6 \\\
@@ -78,16 +78,16 @@ loop
 	bnez t5, loop
 
 
-; /// Step 7 \\\
-; Carry out the write
+	; /// Step 7 \\\
+	; Carry out the write
 	lw t0, CONTROL
 	li t1, 0b1110				; to set R/W to 0	
 	li t2, 0b0010               ; to set RS to 1 
 
-	and t1, t0, t1				; for RW
-	or t1, t1, t2				; for RS
+	and t0, t0, t1				; for RW
+	or t0, t0, t2				; for RS
 	li t4, 0
-	sw t1, CONTROL, t4			; write back to control with correct bits set (t4 must be clear!)
+	sw t0, CONTROL, t4			; write back to control with correct bits set (t4 must be clear!)
 
 	; /// Step 8 \\\
 	; Now to output the data (character) to the data bus
@@ -98,22 +98,22 @@ loop
 	; Enable the bus
 	lw t0, CONTROL
 	li t1, 0b0100 
- 	or t1, t0, t1
+ 	or t0, t0, t1
 	li t4, 0
-	sw t1, CONTROL, t4
+	sw t0, CONTROL, t4
 
 	; /// Step 9a \\\
 	; Delay for 500 ns
-	li t6, 5
+	li t6, 10
 	call delay		
 
 	; /// Step 10 \\\
 	; Disable the bus by setting E to 0
 	lw t0, CONTROL
 	li t1, 0b1011 
-	and t1, t0, t1
+	and t0, t0, t1
 	li t4, 0
-	sw t1, CONTROL, t4
+	sw t0, CONTROL, t4
 
 	lw ra, [sp]
 	addi sp, sp, 4
@@ -137,7 +137,7 @@ delay_loop
 	ret
 
 done
-    ret   
+    jal done
 
 ; --------------------
 ;       SIGNALS
