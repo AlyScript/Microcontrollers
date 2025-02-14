@@ -1,21 +1,20 @@
 ORG 0
 
 start
-	li sp, STACK
-	la s2, STR              ; s2 is a pointer to the string
-	print_loop
-		lw s0, [s2]        ; load the character to be printed into s0
-		beqz s0, done           ; if the character is null, we are done
-		addi s2, s2, 1      ; increment string pointer
-		
-		; push ra onto the stack
-		auipc a0, 0
-		addi a0, a0, 20
-		addi sp, sp, -4
-		sw a0, [sp]
 
-		call puts           ; print the character
-		j print_loop        
+
+	la sp, STACK
+	la s2, STR              ; s2 is a pointer to the string
+	
+
+print_loop
+
+	lb s0, [s2]        ; load the character to be printed into s0
+	beqz s0, done           ; if the character is null, we are done
+	addi s2, s2, 1      ; increment string pointer
+	
+	call puts           ; print the character
+	j print_loop        
 
 
 ; Write a character to the screen
@@ -25,6 +24,9 @@ start
 puts
 	; /// Step 1 \\\
 
+	addi sp, sp, -4
+	sw ra, [sp]
+
 	lw t0, CONTROL					; read what is in the control already
 	li t1, 0b1101					; to set RS to 0 (this might be the wrong way round, I am using little endian)
 	li t2, 0b0001 					; to set R/W to 1 (also might be the wrong way round)
@@ -32,8 +34,6 @@ puts
 	or t0, t2, t0					; set R/W to 1
 	li t4, 0
 	sw t0, CONTROL, t4				; write back to control with correct bits set (t3 must be clear!)
-
-	j loop
 
 loop
 	; /// Step 2 \\\
@@ -46,7 +46,7 @@ loop
 
 	; /// Step 2a \\\
 
-	li t6, 10                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
+	li t6, 5                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
 	call delay						
 	
 	; /// Step 3 \\\
@@ -69,7 +69,7 @@ loop
 	
 	; /// Step 5 \\\
 	; for a 1200 ns delay, we need 12 iterations of the delay loop
-	li t6, 17
+	li t6, 12
 	call delay
 
 	; /// Step 6 \\\
@@ -77,11 +77,9 @@ loop
 	; If bit 7 of Status byte was high repeat from Step 2
 	bnez t5, loop
 
-	jal write
 
 ; /// Step 7 \\\
 ; Carry out the write
-write
 	lw t0, CONTROL
 	li t1, 0b1110				; to set R/W to 0	
 	li t2, 0b0010               ; to set RS to 1 
@@ -93,6 +91,7 @@ write
 
 	; /// Step 8 \\\
 	; Now to output the data (character) to the data bus
+	li t4, 0
 	sw s0, DATA_BUS, t4
 
 	; /// Step 9 \\\
@@ -105,7 +104,7 @@ write
 
 	; /// Step 9a \\\
 	; Delay for 500 ns
-	li t6, 10
+	li t6, 5
 	call delay		
 
 	; /// Step 10 \\\
@@ -125,8 +124,16 @@ write
 ; therefore, for a 1s delay, we need 40_000_000 / 4 = 10_000_000 iterations
 
 delay
+
+	addi sp, sp, -4
+	sw ra, [sp]
+delay_loop
 	addi t6, t6, -1
-	bnez t6, delay
+	bnez t6, delay_loop
+
+	lw ra, [sp]
+	addi sp, sp, 4
+
 	ret
 
 done
@@ -148,5 +155,6 @@ STR DEFB "Hello World!\0"
 ALIGN
 DATA_BUS DEFW 0x0001_0100	
 CONTROL  DEFW 0x0001_0101	
-ALIGN						; Align the stack to 4 bytes (this is probably not necessary since we are already aligned?)
-DEFS 100 STACK				; Reserve 100 bytes for the stack and point to the end (this is a stack `size` of 25, since each `item` is a word...)
+;ALIGN							; Align the stack to 4 bytes (this is probably not necessary since we are already aligned?)
+STACK_END DEFS 100 				; Reserve 100 bytes for the stack and point to the end (this is a stack `size` of 25, since each `item` is a word...)
+STACK
