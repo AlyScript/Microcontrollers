@@ -3,17 +3,17 @@ ORG 0
 start
 
 	la sp, STACK
-	la s2, STR              ; s2 is a pointer to the string
-	
+	la s1, STR              ; s1 is a pointer to the string
+	la s3, CONTROL
 
 print_loop
 
-	lb s0, [s2]        ; load the character to be printed into s0
-	beqz s0, done           ; if the character is null, we are done
-	addi s2, s2, 1      ; increment string pointer
+	lb s0, [s1]         ; load the character to be printed into s0
+	beqz s0, done       ; if the character is null, we are done
+	addi s1, s1, 1      ; increment string pointer
 	
 	call puts           ; print the character
-	j print_loop        
+	j print_loop    	; loop back to print the next character    
 
 
 ; Write a character to the screen
@@ -27,25 +27,20 @@ puts
 	sw ra, [sp]
 
 	lbu t0, CONTROL					; read what is in the control already
-	li t1, 0b1101					; to set RS to 0 (this might be the wrong way round, I am using little endian)
-	li t2, 0b0001 					; to set R/W to 1 (also might be the wrong way round)
-	and t0, t1, t0					; set RS  to 0 
-	or t0, t2, t0					; set R/W to 1
-	li t4, 0
-	sb t0, CONTROL, t4				; write back to control with correct bits set (t3 must be clear!)
+	andi t0, t0, rs_off					; clear RS bit
+	ori t0, t0, rw_on					; set RW bit
+	sb t0, [CONTROL]				; write back to control with correct bits set
 
 loop
 	; /// Step 2 \\\
 
 	lbu t0, CONTROL					; read what is in the control already
-	li t3, 0b1100					; to set E to 1 (and turn backlight on)
-	or t0, t3, t0					; set E to 1
-	li t4, 0
-	sb t0, CONTROL, t4				; write back to control with correct bits set (t4 must be clear!)
+	ori t0, t0, enable_on				; set E bit
+	sb t0, [CONTROL]				; write back to control with correct bits set
 
 	; /// Step 2a \\\
 
-	li t6, 10                        ; t6 == 1 means a 100 ns delay so t6 == 5 means 500 ns delay which is the min delay for the Enable pulse	
+	li a0, 10                        ; a0 == 1 means a 100 ns delay so a0 == 5 means 500 ns delay which is the min delay for the Enable pulse	
 	call delay						
 	
 	; /// Step 3 \\\
@@ -54,21 +49,18 @@ loop
 	; We put the value of this into t5
 
 	lbu t0, DATA_BUS
-	li t5, 0b1000_0000				
-	and t5, t0, t5
+	andi t5, t0, busy				; t5 = t0 & 0b1000_0000
 
 	; /// Step 4 \\\
 
 	; disable bit 2 of control
-	lbu t0, CONTROL
-	li t2, 0b1011					; to set E to 0
-	and t0, t2, t0
-	li t4, 0
-	sb t0, CONTROL, t4				; write back to control with correct bits set (t4 must be clear!)
+	lbu t0, CONTROL				; read what is in the control already
+	andi t0, t0, enable_off		; clear E bit
+	sb t0, [CONTROL]			; write back to control with correct bits set
 	
 	; /// Step 5 \\\
 	; for a 1200 ns delay, we need 12 iterations of the delay loop
-	li t6, 30
+	li a0, 14
 	call delay
 
 	; /// Step 6 \\\
@@ -80,63 +72,57 @@ loop
 	; /// Step 7 \\\
 	; Carry out the write
 	lbu t0, CONTROL
-	li t1, 0b1110				; to set R/W to 0	
-	li t2, 0b0010               ; to set RS to 1 
-
-	and t0, t0, t1				; for RW
-	or t0, t0, t2				; for RS
-	li t4, 0
-	sb t0, CONTROL, t4			; write back to control with correct bits set (t4 must be clear!)
+	andi t0, t0, rw_on
+	ori t0, t0, rs_on
+	sb t0, [CONTROL]		; write back to control with correct bits set (t4 must be clear!)
 
 	; /// Step 8 \\\
 	; Now to output the data (character) to the data bus
-	li t4, 0
-	sb s0, DATA_BUS, t4
+	sb s0, [DATA_BUS]
 
 	; /// Step 9 \\\
 	; Enable the bus
 	lbu t0, CONTROL
-	li t1, 0b0100 
- 	or t0, t0, t1
-	li t4, 0
-	sb t0, CONTROL, t4
+	ori t0, t0, enable_on
+	sb t0, [CONTROL]
 
 	; /// Step 9a \\\
 	; Delay for 500 ns
-	li t6, 10
+	li a0, 10
 	call delay		
 
 	; /// Step 10 \\\
 	; Disable the bus by setting E to 0
 	lbu t0, CONTROL
-	li t1, 0b1011 
-	and t0, t0, t1
-	li t4, 0
-	sb t0, CONTROL, t4
+	andi t0, t0, enable_off
+	sb t0, [CONTROL]						; write back to control with correct bits set
 
-	lw ra, [sp]
-	addi sp, sp, 4
-	ret
-
-; we use t6 as our counter for the delay
-; an empty loop will iterate in 2 + 2 = 4 cycles (100 ns)
-; therefore, for a 1s delay, we need 40_000_000 / 4 = 10_000_000 iterations
-
-delay
-
-	addi sp, sp, -4
-	sw ra, [sp]
-delay_loop
-	addi t6, t6, -1
-	bnez t6, delay_loop
-
-	lw ra, [sp]
-	addi sp, sp, 4
-
+	lw ra, [sp]								; restore ra
+	addi sp, sp, 4							; by popping from the stack		
 	ret
 
 done
     jal done
+
+; -------------------------------------------------------------------------------
+; we use a0 as our counter for the delay									 	
+; an empty loop will iterate in 2 + 2 = 4 cycles (100 ns)						
+; therefore, for a 1s delay, we need 40_000_000 / 4 = 10_000_000 iterations	    	
+																				
+delay																			
+																				
+	addi sp, sp, -4																
+	sw ra, [sp]															        
+																				
+delay_loop																	    
+	addi a0, a0, -1															    
+	bnez a0, delay_loop															
+																				
+	lw ra, [sp]																	
+	addi sp, sp, 4															    
+																				
+	ret																		    
+; -------------------------------------------------------------------------------
 
 ; --------------------
 ;       SIGNALS
@@ -150,10 +136,20 @@ done
 ; LCD E         : Bit 2
 ; LCD Backlight : Bit 3
 
+; Defining some constants for the control register. We always use AND to turn off bits and OR to turn on bits!
+enable_on  EQU 0b0100
+enable_off EQU 0b1011
+rs_on      EQU 0b0010
+rs_off     EQU 0b1101
+rw_on      EQU 0b0001
+rw_off     EQU 0b1110
+
+; Defining LCD Status byte
+busy EQU 0b1000_0000
+
 STR DEFB "Hello World!\0"
 ALIGN
 DATA_BUS EQU 0x0001_0100	
 CONTROL  EQU 0x0001_0101	
-;ALIGN							; Align the stack to 4 bytes (this is probably not necessary since we are already aligned?)
 STACK_END DEFS 100 				; Reserve 100 bytes for the stack and point to the end (this is a stack `size` of 25, since each `item` is a word...)
 STACK
