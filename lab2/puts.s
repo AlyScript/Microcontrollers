@@ -1,6 +1,26 @@
 ORG 0
 
+j start
+
+clear_screen
+	; Push return address and s1
+	sub sp, sp, 8
+	sw ra, 4[sp]
+	sw s1, [sp]
+
+	; Write the clear byte to the screen
+	lb s1, CLEAR
+	call puts
+
+	; Pop return address and s1
+	lw ra, 4[sp]
+	lw s1, [sp]
+	add sp, sp, 8
+
+	ret
+
 start
+	call clear_screen
 	la s1, STR              ; s1 is a pointer to the string
 	call print_string       ; call the print_string function
 
@@ -150,7 +170,11 @@ busy EQU 0b1000_0000
 
 STR DEFB "Hello World!\0"
 ALIGN
+CLEAR DEFB 0x0C, 0 				; Clear screen
+ALIGN
+
 DATA_BUS EQU 0x0001_0100	
 CONTROL  EQU 0x0001_0101	
+
 STACK_END DEFS 100 				; Reserve 100 bytes for the stack and point to the end (this is a stack `size` of 25, since each `item` is a word...)
 STACK
