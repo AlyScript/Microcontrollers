@@ -4,7 +4,7 @@ j start
 
 clear_screen
 	; Push return address and s1
-	sub sp, sp, 8
+	subi sp, sp, 8
 	sw ra, 4[sp]
 	sw s1, [sp]
 
@@ -15,7 +15,7 @@ clear_screen
 	; Pop return address and s1
 	lw ra, 4[sp]
 	lw s1, [sp]
-	add sp, sp, 8
+	addi sp, sp, 8
 
 	ret
 
