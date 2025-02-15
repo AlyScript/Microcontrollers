@@ -1,19 +1,20 @@
 ORG 0
 
 start
-
-	la sp, STACK
 	la s1, STR              ; s1 is a pointer to the string
-	la s3, CONTROL
+	call print_string       ; call the print_string function
 
-print_loop
+; Print a string.
+; Params:
+;		s1: Pointer to the string to be printed
+print_string
 
 	lb s0, [s1]         ; load the character to be printed into s0
 	beqz s0, done       ; if the character is null, we are done
 	addi s1, s1, 1      ; increment string pointer
 	
 	call puts           ; print the character
-	j print_loop    	; loop back to print the next character    
+	j print_string    	; loop back to print the next character    
 
 
 ; Write a character to the screen
