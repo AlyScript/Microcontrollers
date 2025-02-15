@@ -1,3 +1,18 @@
+;-----------------------------------------------------
+; puts - write a character to the screen
+; A. Aly
+; Version 1.0
+; 15th February 2024
+;
+; The `puts` utility function writes a character to the HD44780 LCD display.
+;
+;
+; Last modified: XXX (AA)
+;
+; Known bugs: None
+;
+;-----------------------------------------------------
+
 ORG 0
 
 j start
