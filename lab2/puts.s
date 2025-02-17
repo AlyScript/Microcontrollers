@@ -171,7 +171,7 @@ delay_loop
 ; --------------------
 ; | Data Bus = 8bits |
 ; --------------------
-; |		 Control     |
+; |  Control Signals |
 ; --------------------
 ; LCD R/W       : Bit 0
 ; LCD RS        : Bit 1
