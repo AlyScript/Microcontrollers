@@ -25,7 +25,8 @@ clear_screen
 
 	; Write the clear byte to the screen
 	lb s1, CLEAR
-	call puts
+	sb s1, [s3]
+	;call puts
 
 	; Pop return address and s1
 	lw ra, 4[sp]
@@ -35,9 +36,12 @@ clear_screen
 	ret
 
 start
-	call clear_screen
+	la sp, STACK
 	la s1, STR              ; s1 is a pointer to the string
-	call print_string       ; call the print_string function
+	la s2, CONTROL
+	la s3, DATA_BUS
+	call clear_screen
+	;call print_string       ; call the print_string function
 
 ; Print a string.
 ; Params:
@@ -62,17 +66,17 @@ puts
 	addi sp, sp, -4
 	sw ra, [sp]
 
-	lbu t0, CONTROL					; read what is in the control already
+	lbu t0, CONTROL					    ; read what is in the control already
 	andi t0, t0, rs_off					; clear RS bit
 	ori t0, t0, rw_on					; set RW bit
-	sb t0, [CONTROL]				; write back to control with correct bits set
+	sb t0, [s2]				            ; write back to control with correct bits set
 
 loop
 	; /// Step 2 \\\
 
 	lbu t0, CONTROL					; read what is in the control already
-	ori t0, t0, enable_on				; set E bit
-	sb t0, [CONTROL]				; write back to control with correct bits set
+	ori t0, t0, enable_on			; set E bit
+	sb t0, [s2]						; write back to control with correct bits set
 
 	; /// Step 2a \\\
 
@@ -92,7 +96,7 @@ loop
 	; disable bit 2 of control
 	lbu t0, CONTROL				; read what is in the control already
 	andi t0, t0, enable_off		; clear E bit
-	sb t0, [CONTROL]			; write back to control with correct bits set
+	sb t0, [s2]			; write back to control with correct bits set
 	
 	; /// Step 5 \\\
 	; for a 1200 ns delay, we need 12 iterations of the delay loop
@@ -108,19 +112,19 @@ loop
 	; /// Step 7 \\\
 	; Carry out the write
 	lbu t0, CONTROL
-	andi t0, t0, rw_on
+	andi t0, t0, rw_off
 	ori t0, t0, rs_on
-	sb t0, [CONTROL]		; write back to control with correct bits set (t4 must be clear!)
+	sb t0, [s2]		; write back to control with correct bits set (t4 must be clear!)
 
 	; /// Step 8 \\\
 	; Now to output the data (character) to the data bus
-	sb s0, [DATA_BUS]
+	sb s0, [s3]
 
 	; /// Step 9 \\\
 	; Enable the bus
 	lbu t0, CONTROL
 	ori t0, t0, enable_on
-	sb t0, [CONTROL]
+	sb t0, [s2]
 
 	; /// Step 9a \\\
 	; Delay for 500 ns
@@ -131,7 +135,7 @@ loop
 	; Disable the bus by setting E to 0
 	lbu t0, CONTROL
 	andi t0, t0, enable_off
-	sb t0, [CONTROL]						; write back to control with correct bits set
+	sb t0, [s2]						; write back to control with correct bits set
 
 	lw ra, [sp]								; restore ra
 	addi sp, sp, 4							; by popping from the stack		
@@ -185,7 +189,7 @@ busy EQU 0b1000_0000
 
 STR DEFB "Hello World!\0"
 ALIGN
-CLEAR DEFB 0x0C, 0 				; Clear screen
+CLEAR DEFB 0x01, 0 				; Clear screen
 ALIGN
 
 DATA_BUS EQU 0x0001_0100	
