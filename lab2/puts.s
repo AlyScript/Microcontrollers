@@ -1,4 +1,4 @@
-INCLUDE <delay.s>
+INCLUDE delay.s
 
 ;-----------------------------------------------------
 ; puts_lib.asm

@@ -1,6 +1,6 @@
 ORG 0
 
-<INCLUDE print.s>
+INCLUDE print.s
 
 la sp, STACK
 la a1, STR
