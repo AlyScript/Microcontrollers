@@ -1,4 +1,4 @@
-INCLUDE <puts_lib.s>
+INCLUDE <puts.s>
 
 ;-----------------------------------------------------
 ; print - Print a null-terminated string to the screen
