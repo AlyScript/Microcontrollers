@@ -9,7 +9,7 @@
 ;
 ; Last modified: XXX (AA)
 ;
-; Known bugs: None
+; Known bugs: Clearing the screen is not functional
 ;
 ;-----------------------------------------------------
 
@@ -26,7 +26,6 @@ clear_screen
 	; Write the clear byte to the screen
 	lb s1, CLEAR
 	sb s1, [s3]
-	;call puts
 
 	; Pop return address and s1
 	lw ra, 4[sp]
@@ -37,8 +36,8 @@ clear_screen
 
 start
 	la sp, STACK
-	la s1, STR              ; s1 is a pointer to the string
-	la s2, CONTROL
+	la s1, STR               ; s1 is a pointer to the string
+	la s2, CONTROL			 ;
 	la s3, DATA_BUS
 	call clear_screen
 	;call print_string       ; call the print_string function
@@ -108,7 +107,9 @@ loop
 	; If bit 7 of Status byte was high repeat from Step 2
 	bnez t5, loop
 
+	call write_char
 
+write_char
 	; /// Step 7 \\\
 	; Carry out the write
 	lbu t0, CONTROL
