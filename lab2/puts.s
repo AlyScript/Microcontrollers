@@ -115,7 +115,8 @@ write_char
 	lbu t0, CONTROL
 	andi t0, t0, rw_off
 	ori t0, t0, rs_on
-	sb t0, [s2]		; write back to control with correct bits set (t4 must be clear!)
+	ori t0, t0, backlight
+	sb t0, [s2]				; write back to control with correct bits set (t4 must be clear!)
 
 	; /// Step 8 \\\
 	; Now to output the data (character) to the data bus
@@ -184,6 +185,7 @@ rs_on      EQU 0b0010
 rs_off     EQU 0b1101
 rw_on      EQU 0b0001
 rw_off     EQU 0b1110
+backlight  EQU 0b1000
 
 ; Defining LCD Status byte
 busy EQU 0b1000_0000
