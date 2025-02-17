@@ -39,7 +39,7 @@ start
 	la s1, STR               ; s1 is a pointer to the string
 	la s2, CONTROL			 ;
 	la s3, DATA_BUS
-	call clear_screen
+	;call clear_screen
 	;call print_string       ; call the print_string function
 
 ; Print a string.
