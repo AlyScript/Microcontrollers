@@ -61,7 +61,7 @@ puts
 	ori t0, t0, rw_on					; set RW bit
 	sb t0, [s2]				            ; write back to control with correct bits set
 
-loop
+puts_loop
 	; Step 2: Enable the bus
 	lbu t0, CONTROL					; read what is in the control already
 	ori t0, t0, enable_on			; set E bit
@@ -85,7 +85,7 @@ loop
 	call delay
 
 	; Step 6: If busy flag is set, repeat from Step 2
-	bnez t5, loop
+	bnez t5, puts_loop
 
 	; Step 7: Set control register for writing
 	lbu t0, CONTROL
