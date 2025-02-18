@@ -19,6 +19,9 @@ init
 
     ; Change SP to user stack
     ; ---- Where do we get the location of the user stack though? ----
+    ; This won`t work because we define stack in main.s
+    ; Should we define it here?
+    la sp, STACK
 
     ; Set MEPC to the start of our user program
     la ra, MAIN_START
