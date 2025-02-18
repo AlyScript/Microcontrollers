@@ -19,7 +19,7 @@ print_loop
 	lb a1, [s0]  ; a1 = *s0 (current character)
 
 	; Check if the character is null (end of string)
-	beqz a1, done_printing  ; if a1 == 0, were done
+	beqz a1, done_printing  ; if a1 == 0, we are done
 
 	; Call puts to print the character
 	call puts
