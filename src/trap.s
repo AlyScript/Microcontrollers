@@ -1,4 +1,7 @@
 ORG 0x00000200
+
+INCLUDE puts.s
+
     csrrw sp, mscratch, sp               ; Save User SP, set Machine SP
     ;subi sp, sp, 12                     ; Push working registers
     ;sw, 

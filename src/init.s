@@ -1,7 +1,5 @@
 ORG 0
 
-INCLUDE trap.s
-INCLUDE puts.s
 
 ; ------------ Machine Mode Initialisation -----------------
 
