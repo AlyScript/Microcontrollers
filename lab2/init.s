@@ -19,7 +19,7 @@ init
     csrc mstatus, t0
 
     ; Set MEPC to the start of our user program
-    li t0, 0x00040000
+    li t0, MAIN_START
     csrw mepc, t0
 
     mret
@@ -33,3 +33,6 @@ TRAP_VECTOR EQU 0x00000200
 ; Use CSRC to clear MPP (i.e. for U-Mode)
 ; Use CSRS to set MPP (i.e. for M-Mode)
 MPP_BITMASK   EQU 0x00001800
+
+; Main program start address
+MAIN_START EQU 0x00040000
