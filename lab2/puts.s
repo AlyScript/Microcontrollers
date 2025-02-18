@@ -1,7 +1,7 @@
 INCLUDE delay.s
 
 ;-----------------------------------------------------
-; puts_lib.asm
+; puts - write a single character to the HD44780 LCD display.
 ; A. Aly
 ; Version 1.0
 ; 15th February 2024
