@@ -18,6 +18,7 @@ init
     li t0, MPP_BITMASK
     csrc mstatus, t0
 
+    ; Set MEPC to the start of our user program
     li t0, 0x00040000
     csrw mepc, t0
 
