@@ -1,10 +1,11 @@
-INCLUDE puts.s
-
 ;-----------------------------------------------------
 ; print - Print a null-terminated string to the screen
 ; Arguments:
 ;   a1: Pointer to the string to be printed
 ;-----------------------------------------------------
+
+INCLUDE puts.s
+
 print
 	; Save return address and saved registers
 	addi sp, sp, -8

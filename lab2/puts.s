@@ -1,5 +1,3 @@
-INCLUDE delay.s
-
 ;-----------------------------------------------------
 ; puts - write a single character to the HD44780 LCD display.
 ; A. Aly
@@ -22,6 +20,9 @@ INCLUDE delay.s
 ; LCD RS        : Bit 1
 ; LCD E         : Bit 2
 ; LCD Backlight : Bit 3
+; ----------------------------------------------------
+
+INCLUDE delay.s
 
 ; Defining some constants for the control register. We always use AND to turn off bits and OR to turn on bits!
 enable_on  EQU 0b0100
