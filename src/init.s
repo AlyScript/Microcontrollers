@@ -6,25 +6,25 @@ ORG 0
 init
     ; Clear MPP to set U-Mode
     li t0, MPP_BITMASK
-    csrc mstatus, t0
+    csrc MSTATUS, t0
     
     ; Set the trap vector
     la t0, MHANDLER
-    csrw mtvec, t0
+    csrw MTVEC, t0
     
     ; Copy `machine` SP for use in handler
-    csrw mscratch, sp
+    csrw MSCRATCH, sp
 
     ; Change SP to user stack
     ; ---- Where do we get the location of the user stack though? ----
     ; This won`t work because we define stack in main.s
     ; Should we define it here?
     ; Can`t this just be omitted as we are jumping to main.s anyway?
-    la sp, STACK
+    ;la sp, STACK
 
     ; Set MEPC to the start of our user program
     la ra, MAIN_START
-    csrw mepc, ra
+    csrw MEPC, ra
 
     mret
 
