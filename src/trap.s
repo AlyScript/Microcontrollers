@@ -24,22 +24,22 @@ INCLUDE puts.s
 
 
 trap_table
-    DEFW handle_instr_addr_misaligned    # 0 - Instruction address misaligned
-    DEFW handle_instr_access_fault       # 1 - Instruction access fault
-    DEFW handle_illegal_instr            # 2 - Illegal instruction
-    DEFW handle_breakpoint               # 3 - Breakpoint
-    DEFW handle_load_addr_misaligned     # 4 - Load address misaligned
-    DEFW handle_load_access_fault        # 5 - Load access fault
-    DEFW handle_store_addr_misaligned    # 6 - Store address misaligned
-    DEFW handle_store_access_fault       # 7 - Store access fault
-    DEFW handle_ecall_umode              # 8 - Environment call from U-mode
-    DEFW handle_ecall_smode              # 9 - Environment call from S-mode
-    DEFW handle_reserved                 # 10 - Reserved
-    DEFW handle_ecall_mmode              # 11 - Environment call from M-mode
-    DEFW handle_instr_page_fault         # 12 - Instruction page fault
-    DEFW handle_load_page_fault          # 13 - Load page fault
-    DEFW handle_reserved_future          # 14 - Reserved for future standard use
-    DEFW handle_store_page_fault         # 15 - Store page fault
+    DEFW handle_instr_addr_misaligned    ; 0 - Instruction address misaligned
+    DEFW handle_instr_access_fault       ; 1 - Instruction access fault
+    DEFW handle_illegal_instr            ; 2 - Illegal instruction
+    DEFW handle_breakpoint               ; 3 - Breakpoint
+    DEFW handle_load_addr_misaligned     ; 4 - Load address misaligned
+    DEFW handle_load_access_fault        ; 5 - Load access fault
+    DEFW handle_store_addr_misaligned    ; 6 - Store address misaligned
+    DEFW handle_store_access_fault       ; 7 - Store access fault
+    DEFW handle_ecall_umode              ; 8 - Environment call from U-mode
+    DEFW handle_ecall_smode              ; 9 - Environment call from S-mode
+    DEFW handle_reserved                 ; 10 - Reserved
+    DEFW handle_ecall_mmode              ; 11 - Environment call from M-mode
+    DEFW handle_instr_page_fault         ; 12 - Instruction page fault
+    DEFW handle_load_page_fault          ; 13 - Load page fault
+    DEFW handle_reserved_future          ; 14 - Reserved for future standard use
+    DEFW handle_store_page_fault         ; 15 - Store page fault
 
 handle_instr_addr_misaligned:  
 handle_instr_access_fault:     
