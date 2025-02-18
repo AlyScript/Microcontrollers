@@ -21,6 +21,7 @@ init
     ; ---- Where do we get the location of the user stack though? ----
     ; This won`t work because we define stack in main.s
     ; Should we define it here?
+    ; Can`t this just be omitted as we are jumping to main.s anyway?
     la sp, STACK
 
     ; Set MEPC to the start of our user program
